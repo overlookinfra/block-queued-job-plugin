@@ -2,6 +2,6 @@ package org.jenkinsci.plugins.blockqueuedjob.condition.BuildingBlockQueueConditi
 
 def f = namespace(lib.FormTagLib);
 
-f.entry(field: "project", title: "Depends on job" ) {
+f.entry(title: "Depends on job", field: "project") {
     f.textbox()
 }

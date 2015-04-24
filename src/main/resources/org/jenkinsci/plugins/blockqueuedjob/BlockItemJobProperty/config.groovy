@@ -9,7 +9,7 @@ f.optionalBlock(title: "Block/Unblock task in queue",
         name: "hasBlockedJobProperty",
         inline: true,
         checked: (instance != null)
-){
+) {
 
     f.entry() {
         f.hetero_list(name: "conditions",

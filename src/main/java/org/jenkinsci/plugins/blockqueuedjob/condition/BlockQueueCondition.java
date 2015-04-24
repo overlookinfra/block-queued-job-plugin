@@ -9,6 +9,7 @@ import jenkins.model.Jenkins;
 
 /**
  * Abstract class for block/unblock conditions
+ *
  * @author Kanstantsin Shautsou
  */
 abstract public class BlockQueueCondition implements Describable<BlockQueueCondition>, ExtensionPoint {
@@ -16,15 +17,16 @@ abstract public class BlockQueueCondition implements Describable<BlockQueueCondi
     /**
      * @return not null for blocking job with description
      */
-    public CauseOfBlockage isBlocked(){
+    public CauseOfBlockage isBlocked() {
         return null;
     }
 
     /**
      * condition for unblocking
+     *
      * @return false - nothing, true - need unblock
      */
-    public boolean isUnblocked(){
+    public boolean isUnblocked() {
         return false;
     }
 

@@ -4,6 +4,7 @@ import jenkins.model.Jenkins;
 
 /**
  * Various helpers
+ *
  * @author Kanstantsin Shautsou
  */
 public class Utils {

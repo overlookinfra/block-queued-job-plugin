@@ -1,15 +1,12 @@
 package org.jenkinsci.plugins.blockqueuedjob;
 
 import hudson.Extension;
-import hudson.Util;
-import hudson.model.*;
-import hudson.util.DescribableList;
+import hudson.model.AbstractProject;
+import hudson.model.JobProperty;
+import hudson.model.JobPropertyDescriptor;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition;
-import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition.*;
-import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
@@ -17,9 +14,10 @@ import java.util.List;
 
 /**
  * Project property for {@link BlockItemQueueTaskDispatcher}. Contains configured conditions.
+ *
  * @author Kanstantsin Shautsou
  */
-public class BlockItemJobProperty extends JobProperty<AbstractProject<?,?>> {
+public class BlockItemJobProperty extends JobProperty<AbstractProject<?, ?>> {
 
     @CheckForNull
     private List<BlockQueueCondition> conditions;

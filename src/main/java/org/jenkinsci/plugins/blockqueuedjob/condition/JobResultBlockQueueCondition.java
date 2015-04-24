@@ -15,6 +15,7 @@ import javax.annotation.CheckForNull;
 
 /**
  * Blocks according to last build result of specified job
+ *
  * @author Kanstantsin Shautsou
  */
 public class JobResultBlockQueueCondition extends BlockQueueCondition {
@@ -52,11 +53,11 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
                 final AbstractProject<?, ?> project = (AbstractProject<?, ?>) item;
                 final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
                 if (lastBuild != null) {
-                   if (lastBuild.getResult().isWorseOrEqualTo(result)) {
+                    if (lastBuild.getResult().isWorseOrEqualTo(result)) {
                         blocked = new CauseOfBlockage() {
                             @Override
                             public String getShortDescription() {
-                                return "Last " + project.getFullName() +  "  build is " + lastBuild.getResult();
+                                return "Last " + project.getFullName() + "  build is " + lastBuild.getResult();
                             }
                         };
                     }
@@ -80,8 +81,8 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
     public static class DescriptorImpl extends BlockQueueConditionDescriptor {
 
         public AutoCompletionCandidates doAutoCompleteProject(@QueryParameter String value,
-                                                               @AncestorInPath Item self,
-                                                               @AncestorInPath ItemGroup container) {
+                                                              @AncestorInPath Item self,
+                                                              @AncestorInPath ItemGroup container) {
             return AutoCompletionCandidates.ofJobNames(Job.class, value, self, container);
         }
 
@@ -90,7 +91,7 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
 
             if (project == null || project.isEmpty()) {
                 formValidation = FormValidation.error("Job must be specified");
-            } else if (Utils.getJenkinsInstance().getItem(project) == null){
+            } else if (Utils.getJenkinsInstance().getItem(project) == null) {
                 formValidation = FormValidation.error("Job " + project + " not found");
             } else {
                 formValidation = FormValidation.ok();

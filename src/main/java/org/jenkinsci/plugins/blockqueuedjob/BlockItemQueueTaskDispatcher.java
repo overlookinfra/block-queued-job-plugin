@@ -5,14 +5,13 @@ import hudson.model.AbstractProject;
 import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
-import hudson.util.DescribableList;
 import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition;
-import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition.*;
 
 import java.util.List;
 
 /**
  * Blocks item from execution according to configuration in JobProperty
+ *
  * @author Kanstantsin Shautsou
  */
 @Extension
