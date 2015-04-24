@@ -27,11 +27,11 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
                 if (conditions != null) {
                     // first matched win
                     for (BlockQueueCondition condition : conditions) {
-                        if (condition.isUnblocked()) {
+                        if (condition.isUnblocked(item)) {
                             return null; // unblock
                         }
 
-                        final CauseOfBlockage blocked = condition.isBlocked();
+                        final CauseOfBlockage blocked = condition.isBlocked(item);
                         if (blocked != null) {
                             return blocked; // block
                         }

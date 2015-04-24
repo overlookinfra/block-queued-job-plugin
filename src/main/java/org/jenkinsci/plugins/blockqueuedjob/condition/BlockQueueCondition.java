@@ -4,6 +4,7 @@ import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import jenkins.model.Jenkins;
 
@@ -17,7 +18,7 @@ abstract public class BlockQueueCondition implements Describable<BlockQueueCondi
     /**
      * @return not null for blocking job with description
      */
-    public CauseOfBlockage isBlocked() {
+    public CauseOfBlockage isBlocked(Queue.Item item) {
         return null;
     }
 
@@ -26,7 +27,7 @@ abstract public class BlockQueueCondition implements Describable<BlockQueueCondi
      *
      * @return false - nothing, true - need unblock
      */
-    public boolean isUnblocked() {
+    public boolean isUnblocked(Queue.Item item) {
         return false;
     }
 

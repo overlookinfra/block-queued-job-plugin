@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.blockqueuedjob;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
@@ -24,7 +25,7 @@ public class BlockItemJobProperty extends JobProperty<AbstractProject<?, ?>> {
 
     @DataBoundConstructor
     public BlockItemJobProperty(List<BlockQueueCondition> conditions) {
-        this.conditions = conditions;
+        this.conditions = Util.fixNull(conditions);
     }
 
     public List<BlockQueueCondition> getConditions() {

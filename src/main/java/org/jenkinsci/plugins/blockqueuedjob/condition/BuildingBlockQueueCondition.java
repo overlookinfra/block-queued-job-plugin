@@ -32,17 +32,17 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
     }
 
     @Override
-    public CauseOfBlockage isBlocked() {
+    public CauseOfBlockage isBlocked(Queue.Item item) {
         if (project == null || project.isEmpty()) {
             return null; //don't pause all jobs because of not filled configuration
         }
 
         CauseOfBlockage blocked = null;
         Jenkins instance = Utils.getJenkinsInstance();
-        TopLevelItem item = instance.getItem(project);
-        if (item != null) {
-            if (item instanceof AbstractProject<?, ?>) {
-                final AbstractProject<?, ?> project = (AbstractProject<?, ?>) item;
+        TopLevelItem targetProject = instance.getItem(project);
+        if (targetProject != null) {
+            if (targetProject instanceof AbstractProject<?, ?>) {
+                final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
                 final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
                 if (lastBuild != null && lastBuild.isBuilding()) { // wait result
                     blocked = new CauseOfBlockage() {
