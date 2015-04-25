@@ -44,7 +44,9 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
 
         CauseOfBlockage blocked = null;
         Jenkins instance = Utils.getJenkinsInstance();
-        TopLevelItem targetProject = instance.getItem(project);
+        AbstractProject<?, ?> taskProject = (AbstractProject<?, ?>) item.task;
+
+        Item targetProject = instance.getItem(project, taskProject.getParent());
         if (targetProject instanceof AbstractProject<?, ?>) {
             final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
             final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
@@ -52,7 +54,7 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
                 blocked = new CauseOfBlockage() {
                     @Override
                     public String getShortDescription() {
-                        return project.getFullName() + " is building: " + lastBuild.getDisplayName();
+                        return "BuildingBlockQueueCondition: " + project.getFullName() + " is building: " + lastBuild.getDisplayName();
                     }
                 };
             }
@@ -71,13 +73,14 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
             return AutoCompletionCandidates.ofJobNames(Job.class, value, self, container);
         }
 
-        public FormValidation doCheckProject(@QueryParameter String project) {
+        public FormValidation doCheckProject(@QueryParameter String project,
+                                             @AncestorInPath Item self) {
             FormValidation formValidation;
 
             if (project == null || project.isEmpty()) {
                 formValidation = FormValidation.error("Job must be specified");
-            } else if (Utils.getJenkinsInstance().getItem(project) == null) {
-                formValidation = FormValidation.error("Job " + project + " not found");
+            } else if (Utils.getJenkinsInstance().getItem(project, self.getParent()) == null) {
+                formValidation = FormValidation.error("Job: '" + project + "', parent: '" + self.getParent().getFullName() + "' not found");
             } else {
                 formValidation = FormValidation.ok();
             }
