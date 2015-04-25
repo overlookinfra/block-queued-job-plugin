@@ -40,18 +40,16 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
         CauseOfBlockage blocked = null;
         Jenkins instance = Utils.getJenkinsInstance();
         TopLevelItem targetProject = instance.getItem(project);
-        if (targetProject != null) {
-            if (targetProject instanceof AbstractProject<?, ?>) {
-                final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
-                final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
-                if (lastBuild != null && lastBuild.isBuilding()) { // wait result
-                    blocked = new CauseOfBlockage() {
-                        @Override
-                        public String getShortDescription() {
-                            return project.getFullName() + " is building: " + lastBuild.getDisplayName();
-                        }
-                    };
-                }
+        if (targetProject instanceof AbstractProject<?, ?>) {
+            final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
+            final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
+            if (lastBuild != null && lastBuild.isBuilding()) { // wait result
+                blocked = new CauseOfBlockage() {
+                    @Override
+                    public String getShortDescription() {
+                        return project.getFullName() + " is building: " + lastBuild.getDisplayName();
+                    }
+                };
             }
         }
 

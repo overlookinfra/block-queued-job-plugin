@@ -12,7 +12,7 @@ public class Utils {
     public static Jenkins getJenkinsInstance() {
         Jenkins instance = Jenkins.getInstance();
         if (instance == null) {
-            throw new IllegalStateException("Jenkins instance is not exist");
+            throw new IllegalStateException("Jenkins instance does not exist");
         }
 
         return instance;

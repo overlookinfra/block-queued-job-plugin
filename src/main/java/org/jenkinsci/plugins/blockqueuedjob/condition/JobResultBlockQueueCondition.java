@@ -47,29 +47,31 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
 
         CauseOfBlockage blocked = null;
         Jenkins instance = Utils.getJenkinsInstance();
-        TopLevelItem targetProject = instance.getItem(project);
-        if (targetProject != null) {
-            if (targetProject instanceof AbstractProject<?, ?>) {
-                final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
-                final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
-                if (lastBuild != null) {
-                    if (lastBuild.getResult().isWorseOrEqualTo(result)) {
-                        blocked = new CauseOfBlockage() {
-                            @Override
-                            public String getShortDescription() {
-                                return "Last " + project.getFullName() + "  build is " + lastBuild.getResult();
-                            }
-                        };
-                    }
-                } else {
-                    // no builds -> allow run
+        final TopLevelItem targetProject = instance.getItem(project);
+        if (targetProject instanceof AbstractProject<?, ?>) {
+            final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
+            final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
+            if (lastBuild != null) {
+                if (lastBuild.getResult().isWorseOrEqualTo(result)) {
+                    blocked = new CauseOfBlockage() {
+                        @Override
+                        public String getShortDescription() {
+                            return "Last " + project.getFullName() + "  build is " + lastBuild.getResult();
+                        }
+                    };
                 }
-            }
+            } // else no builds -> allow run
         } else {
             blocked = new CauseOfBlockage() {
                 @Override
                 public String getShortDescription() {
-                    return project + " job not found";
+                    String error;
+                    if (targetProject == null) {
+                        error = "Job " + project + " not exist";
+                    } else {
+                        error = "Job " + project + " has unknown type " + project.getClass();
+                    }
+                    return error;
                 }
             };
         }
