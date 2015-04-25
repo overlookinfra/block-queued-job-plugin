@@ -8,10 +8,10 @@ def conditions = (instance == null ? [] : instance.conditions)
 f.optionalBlock(title: "Block/Unblock task in queue",
         name: "hasBlockedJobProperty",
         inline: true,
-        checked: (instance != null)
+        checked: (instance != null),
+        help: descriptor.helpFile
 ) {
-
-    f.entry() {
+    f.entry(help: descriptor.getHelpFile("conditions")) {
         f.hetero_list(name: "conditions",
                 items: conditions,
                 descriptors: BlockQueueCondition.BlockQueueConditionDescriptor.all(),
