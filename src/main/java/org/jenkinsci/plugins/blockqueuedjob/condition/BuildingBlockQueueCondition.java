@@ -14,7 +14,6 @@ import javax.annotation.CheckForNull;
 
 /**
  * Blocks when specified last build from job is building
- * //TODO get all building for throttle concurrent?
  *
  * @author Kanstantsin Shautsou
  */
