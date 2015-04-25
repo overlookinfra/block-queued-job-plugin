@@ -41,8 +41,14 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
 
     @Override
     public CauseOfBlockage isBlocked(Queue.Item item) {
+        // user configured blocking, so doesn't allow bad configurations
         if (project == null || project.isEmpty() || result == null) {
-            return null; //don't pause all jobs because of not filled configuration
+            return new CauseOfBlockage() {
+                @Override
+                public String getShortDescription() {
+                    return "JobResultBlockQueueCondition: bad condition configuration!";
+                }
+            };
         }
 
         CauseOfBlockage blocked = null;

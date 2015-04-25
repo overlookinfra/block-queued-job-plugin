@@ -32,8 +32,14 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
 
     @Override
     public CauseOfBlockage isBlocked(Queue.Item item) {
+        // user configured blocking, so doesn't allow bad configurations
         if (project == null || project.isEmpty()) {
-            return null; //don't pause all jobs because of not filled configuration
+            return new CauseOfBlockage() {
+                @Override
+                public String getShortDescription() {
+                    return "BuildingBlockQueueCondition: project is not specified!";
+                }
+            };
         }
 
         CauseOfBlockage blocked = null;
