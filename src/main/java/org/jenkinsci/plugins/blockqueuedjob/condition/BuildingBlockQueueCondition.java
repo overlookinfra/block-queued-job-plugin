@@ -46,7 +46,7 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
         Jenkins instance = Utils.getJenkinsInstance();
         AbstractProject<?, ?> taskProject = (AbstractProject<?, ?>) item.task;
 
-        Item targetProject = instance.getItem(project, taskProject.getParent());
+        final Item targetProject = instance.getItem(project, taskProject.getParent());
         if (targetProject instanceof AbstractProject<?, ?>) {
             final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
             final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
@@ -58,6 +58,20 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
                     }
                 };
             }
+        } else {
+            blocked = new CauseOfBlockage() {
+                @Override
+                public String getShortDescription() {
+                    String error;
+                    if (targetProject == null) {
+                        error = "BuildingBlockQueueCondition: Job " + project + " not exist";
+                    } else {
+                        error = "BuildingBlockQueueCondition: Job " + project + " has unknown type "
+                                + project.getClass();
+                    }
+                    return error;
+                }
+            };
         }
 
         return blocked;
