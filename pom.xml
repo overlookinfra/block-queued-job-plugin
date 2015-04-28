@@ -14,7 +14,7 @@
     <packaging>hpi</packaging>
 
     <name>Block Queued Job Plugin</name>
-    <description>Blocks/unblocks job in queue with matched conditions</description>
+    <description>Blocks/unblocks job in queue with matched conditions scope</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Block+queued+job+plugin</url>
     <licenses>
         <license>
