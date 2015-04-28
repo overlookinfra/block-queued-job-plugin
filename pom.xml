@@ -13,8 +13,8 @@
     <version>0.1.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
-    <name>Block queued job</name>
-    <description>Blocks job in queue with matched condition</description>
+    <name>Block Queued Job Plugin</name>
+    <description>Blocks/unblocks job in queue with matched conditions</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Block+queued+job+plugin</url>
     <licenses>
         <license>
