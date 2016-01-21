@@ -9,7 +9,8 @@ import jenkins.model.Jenkins;
  */
 public class Utils {
 
-    public static Jenkins getJenkinsInstance() {
+    @Deprecated
+    public static Jenkins getActiveJenkinsInstance() {
         Jenkins instance = Jenkins.getInstance();
         if (instance == null) {
             throw new IllegalStateException("Jenkins instance does not exist");

@@ -1,10 +1,14 @@
 package org.jenkinsci.plugins.blockqueuedjob.condition;
 
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Item;
+import hudson.model.ItemGroup;
+import hudson.model.Queue;
+import hudson.model.Run;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.blockqueuedjob.condition.BuildingBlockQueueCondition;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,25 +18,30 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Jenkins.class, ItemGroup.class, AbstractBuild.class})
+@PrepareForTest({Jenkins.class, ItemGroup.class, Run.class})
 public class BuildingBlockQueueConditionTest {
 
     private static final String PROJECT_NAME = "project_name";
     private static final String BAD_PROJECT_NAME = "";
 
-    @Mock private Queue.Item queueItem;
-    @Mock private Item item;
-    @Mock private AbstractProject targetProject;
-    @Mock private AbstractProject<?, ?> taskProject;
-    @Mock private Jenkins instance;
-    @Mock private AbstractBuild<?, ?> lastBuild;
-    @Mock private ItemGroup parent;
+    @Mock
+    private Queue.Item queueItem;
+    @Mock
+    private Item item;
+    @Mock
+    private AbstractProject targetProject;
+    @Mock
+    private AbstractProject<?, ?> taskProject;
+    @Mock
+    private Jenkins instance;
+    @Mock
+    private AbstractBuild<?, ?> lastBuild;
+    @Mock
+    private ItemGroup parent;
 
     @Test
     public void isBlockedProjectNotSpecified() {
@@ -111,7 +120,7 @@ public class BuildingBlockQueueConditionTest {
     @Test
     public void doCheckProjectGoodProject() {
         PowerMockito.mockStatic(Jenkins.class);
-        when(Jenkins.getInstance()).thenReturn(instance);
+        when(Jenkins.getActiveInstance()).thenReturn(instance);
         when(item.getParent()).thenReturn(parent);
         when(instance.getItem(PROJECT_NAME, parent)).thenReturn(targetProject);
 
@@ -123,7 +132,7 @@ public class BuildingBlockQueueConditionTest {
     @Test
     public void doCheckProjectNullProject() {
         PowerMockito.mockStatic(Jenkins.class);
-        when(Jenkins.getInstance()).thenReturn(instance);
+        when(Jenkins.getActiveInstance()).thenReturn(instance);
         when(item.getParent()).thenReturn(parent);
         when(instance.getItem(PROJECT_NAME, parent)).thenReturn(null);
 
@@ -134,7 +143,7 @@ public class BuildingBlockQueueConditionTest {
 
     private void commonExpectations(Item targetProject) {
         PowerMockito.mockStatic(Jenkins.class);
-        when(Jenkins.getInstance()).thenReturn(instance);
+        when(Jenkins.getActiveInstance()).thenReturn(instance);
         Whitebox.setInternalState(queueItem, "task", taskProject);
         when(taskProject.getParent()).thenReturn(parent);
         when(parent.getFullName()).thenReturn("name");

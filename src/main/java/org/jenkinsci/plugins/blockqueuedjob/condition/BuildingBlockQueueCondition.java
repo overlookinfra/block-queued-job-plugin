@@ -12,6 +12,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.CheckForNull;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 /**
  * Blocks when specified last build from job is building
  *
@@ -33,7 +35,7 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
     @Override
     public CauseOfBlockage isBlocked(Queue.Item item) {
         // user configured blocking, so doesn't allow bad configurations
-        if (project == null || project.isEmpty()) {
+        if (isEmpty(project)) {
             return new CauseOfBlockage() {
                 @Override
                 public String getShortDescription() {
@@ -43,18 +45,20 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
         }
 
         CauseOfBlockage blocked = null;
-        Jenkins instance = Utils.getJenkinsInstance();
-        AbstractProject<?, ?> taskProject = (AbstractProject<?, ?>) item.task;
+        Jenkins instance = Jenkins.getActiveInstance();
 
-        final Item targetProject = instance.getItem(project, taskProject.getParent());
-        if (targetProject instanceof AbstractProject<?, ?>) {
-            final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
-            final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
-            if (lastBuild != null && lastBuild.isBuilding()) { // wait result
+        Job<?, ?> taskJob = (Job<?, ?>) item.task;
+
+        final Item targetJob = instance.getItem(project, taskJob.getParent());
+        if (targetJob instanceof Job<?, ?>) {
+            final Job<?, ?> job = (Job<?, ?>) targetJob;
+            final Run<?, ?> lastRun = job.getLastBuild();
+            if (lastRun != null && lastRun.isBuilding()) { // wait result
                 blocked = new CauseOfBlockage() {
                     @Override
                     public String getShortDescription() {
-                        return "BuildingBlockQueueCondition: " + project.getFullName() + " is building: " + lastBuild.getDisplayName();
+                        return String.format("BuildingBlockQueueCondition: %s is building: %s",
+                                job.getFullName(), lastRun.getDisplayName());
                     }
                 };
             }
@@ -63,11 +67,11 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
                 @Override
                 public String getShortDescription() {
                     String error;
-                    if (targetProject == null) {
+                    if (targetJob == null) {
                         error = "BuildingBlockQueueCondition: Job " + project + " not exist";
                     } else {
-                        error = "BuildingBlockQueueCondition: Job " + project + " has unknown type "
-                                + project.getClass();
+                        error = String.format("BuildingBlockQueueCondition: Job %s has unknown type %s",
+                                project, project.getClass());
                     }
                     return error;
                 }
@@ -91,10 +95,11 @@ public class BuildingBlockQueueCondition extends BlockQueueCondition {
                                              @AncestorInPath Item self) {
             FormValidation formValidation;
 
-            if (project == null || project.isEmpty()) {
+            if (isEmpty(project)) {
                 formValidation = FormValidation.error("Job must be specified");
-            } else if (Utils.getJenkinsInstance().getItem(project, self.getParent()) == null) {
-                formValidation = FormValidation.error("Job: '" + project + "', parent: '" + self.getParent().getFullName() + "' not found");
+            } else if (Jenkins.getActiveInstance().getItem(project, self.getParent()) == null) {
+                formValidation = FormValidation.error(String.format("Job: '%s', parent: '%s' not found", project,
+                        self.getParent().getFullName()));
             } else {
                 formValidation = FormValidation.ok();
             }
