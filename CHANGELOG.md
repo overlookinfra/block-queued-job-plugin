@@ -1,5 +1,10 @@
 ## Changelog
 
+## 0.2.0
+
+* Support Job.class for workflow. 
+* Bump core dep.
+
 ## 0.1.1
 
 * Updated plugin description for update center
