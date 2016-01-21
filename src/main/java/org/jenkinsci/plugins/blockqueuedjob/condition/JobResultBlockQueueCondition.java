@@ -1,17 +1,24 @@
 package org.jenkinsci.plugins.blockqueuedjob.condition;
 
 import hudson.Extension;
-import hudson.model.*;
+import hudson.model.AutoCompletionCandidates;
+import hudson.model.Item;
+import hudson.model.ItemGroup;
+import hudson.model.Job;
+import hudson.model.Queue;
+import hudson.model.Result;
+import hudson.model.Run;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.blockqueuedjob.utils.Utils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.CheckForNull;
+
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * Blocks according to last build result of specified job
@@ -42,7 +49,7 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
     @Override
     public CauseOfBlockage isBlocked(Queue.Item item) {
         // user configured blocking, so doesn't allow bad configurations
-        if (project == null || project.isEmpty() || result == null) {
+        if (isEmpty(project) || result == null) {
             return new CauseOfBlockage() {
                 @Override
                 public String getShortDescription() {
@@ -52,19 +59,19 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
         }
 
         CauseOfBlockage blocked = null;
-        Jenkins instance = Utils.getJenkinsInstance();
-        final AbstractProject<?, ?> itemTask = (AbstractProject<?, ?>) item.task;
+        Jenkins instance = Jenkins.getActiveInstance();
+        final Job<?, ?> itemTask = (Job<?, ?>) item.task;
 
         final Item targetProject = instance.getItem(project, itemTask.getParent());
-        if (targetProject instanceof AbstractProject<?, ?>) {
-            final AbstractProject<?, ?> project = (AbstractProject<?, ?>) targetProject;
-            final AbstractBuild<?, ?> lastBuild = project.getLastBuild();
-            if (lastBuild != null) {
-                if (lastBuild.getResult().isWorseOrEqualTo(result)) {
+        if (targetProject instanceof Job<?, ?>) {
+            final Job<?, ?> job = (Job<?, ?>) targetProject;
+            final Run<?, ?> lastRun = job.getLastBuild();
+            if (lastRun != null) {
+                if (lastRun.getResult().isWorseOrEqualTo(result)) {
                     blocked = new CauseOfBlockage() {
                         @Override
                         public String getShortDescription() {
-                            return "Last " + project.getFullName() + "  build is " + lastBuild.getResult();
+                            return String.format("Last %s  build is %s", job.getFullName(), lastRun.getResult());
                         }
                     };
                 }
@@ -100,10 +107,11 @@ public class JobResultBlockQueueCondition extends BlockQueueCondition {
                                              @AncestorInPath Item self) {
             FormValidation formValidation;
 
-            if (project == null || project.isEmpty()) {
+            if (isEmpty(project)) {
                 formValidation = FormValidation.error("Job must be specified");
-            } else if (Utils.getJenkinsInstance().getItem(project, self.getParent()) == null) {
-                formValidation = FormValidation.error("Job: '" + project + "', parent: '" + self.getParent().getFullName() + "' not found");
+            } else if (Jenkins.getActiveInstance().getItem(project, self.getParent()) == null) {
+                formValidation = FormValidation.error(String.format("Job: '%s', parent: '%s' not found",
+                        project, self.getParent().getFullName()));
             } else {
                 formValidation = FormValidation.ok();
             }

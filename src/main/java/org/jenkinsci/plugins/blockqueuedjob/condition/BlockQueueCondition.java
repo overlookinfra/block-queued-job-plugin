@@ -32,7 +32,7 @@ abstract public class BlockQueueCondition implements Describable<BlockQueueCondi
     }
 
     public Descriptor<BlockQueueCondition> getDescriptor() {
-        return (BlockQueueConditionDescriptor) Jenkins.getInstance().getDescriptorOrDie(getClass());
+        return (BlockQueueConditionDescriptor) Jenkins.getActiveInstance().getDescriptorOrDie(getClass());
     }
 
     /**
@@ -43,7 +43,7 @@ abstract public class BlockQueueCondition implements Describable<BlockQueueCondi
          * @return all available blocking conditions
          */
         public static DescriptorExtensionList<BlockQueueCondition, BlockQueueConditionDescriptor> all() {
-            return Jenkins.getInstance().getDescriptorList(BlockQueueCondition.class);
+            return Jenkins.getActiveInstance().getDescriptorList(BlockQueueCondition.class);
         }
     }
 }

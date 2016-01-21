@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.blockqueuedjob;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
@@ -18,10 +19,10 @@ import java.util.List;
 public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     @Override
     public CauseOfBlockage canRun(Queue.Item item) {
-        if (item.task instanceof AbstractProject<?, ?>) {
-            AbstractProject<?, ?> project = (AbstractProject<?, ?>) item.task;
+        if (item.task instanceof Job<?, ?>) {
+            Job<?, ?> job = (Job<?, ?>) item.task;
 
-            final BlockItemJobProperty property = project.getProperty(BlockItemJobProperty.class);
+            final BlockItemJobProperty property = job.getProperty(BlockItemJobProperty.class);
             if (property != null) {
                 List<BlockQueueCondition> conditions = property.getConditions();
                 if (conditions != null) {

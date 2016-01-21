@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.blockqueuedjob.condition;
 
 import hudson.Functions;
 import hudson.model.FreeStyleProject;
+import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.Result;
 import org.jenkinsci.plugins.blockqueuedjob.BlockItemJobProperty;
@@ -19,6 +20,8 @@ public class BlockQueueConditionTest {
     public JenkinsRule j = new JenkinsRule();
 
     private boolean origDefaultUseCache = true;
+
+    final static String NOT_EXISTED_JOB = "y67";
 
     @Before
     public void setUp() throws Exception {
@@ -40,8 +43,7 @@ public class BlockQueueConditionTest {
         FreeStyleProject project = j.createFreeStyleProject("test-job");
         FreeStyleProject project2 = j.createFreeStyleProject("test-job2");
 
-        final String unexistingJob = "y67";
-        final JobResultBlockQueueCondition condition = new JobResultBlockQueueCondition(unexistingJob, Result.UNSTABLE);
+        final JobResultBlockQueueCondition condition = new JobResultBlockQueueCondition(NOT_EXISTED_JOB, Result.UNSTABLE);
         final ArrayList<BlockQueueCondition> describables = new ArrayList<>();
         describables.add(condition);
         final BlockItemJobProperty blockItemJobProperty = new BlockItemJobProperty(describables);
@@ -57,7 +59,7 @@ public class BlockQueueConditionTest {
 
         assertNotNull("Item must be in queue", item);
         assertTrue("Item must be blocked", item.isBlocked());
-        Assert.assertEquals("Expected CauseOfBlockage to be returned", "Job " + unexistingJob + " not exist", item.getWhy());
+        Assert.assertEquals("Expected CauseOfBlockage to be returned", "Job " + NOT_EXISTED_JOB + " not exist", item.getWhy());
 
         assertNull("Item2 mustn't be in queue", item2);
     }

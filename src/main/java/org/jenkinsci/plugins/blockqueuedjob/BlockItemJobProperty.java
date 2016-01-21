@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.blockqueuedjob;
 
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import net.sf.json.JSONObject;
@@ -11,6 +11,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ import java.util.List;
  *
  * @author Kanstantsin Shautsou
  */
-public class BlockItemJobProperty extends JobProperty<AbstractProject<?, ?>> {
+public class BlockItemJobProperty extends JobProperty<Job<?, ?>> {
 
     @CheckForNull
     private List<BlockQueueCondition> conditions;
@@ -28,8 +29,9 @@ public class BlockItemJobProperty extends JobProperty<AbstractProject<?, ?>> {
         this.conditions = Util.fixNull(conditions);
     }
 
+    @Nonnull
     public List<BlockQueueCondition> getConditions() {
-        return conditions;
+        return Util.fixNull(conditions);
     }
 
     @Override

@@ -1,8 +1,9 @@
 package org.jenkinsci.plugins.blockqueuedjob.BlockItemJobProperty
 
+import lib.FormTagLib
 import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition
 
-def f = namespace(lib.FormTagLib);
+def f = namespace(FormTagLib);
 def conditions = (instance == null ? [] : instance.conditions)
 
 f.optionalBlock(title: "Block/Unblock task in queue",
