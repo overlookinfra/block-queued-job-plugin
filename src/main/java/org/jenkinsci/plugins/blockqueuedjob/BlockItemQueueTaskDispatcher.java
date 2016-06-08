@@ -10,6 +10,7 @@ import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
 import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition;
+import hudson.model.StringParameterValue;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.Combination;
@@ -24,7 +25,7 @@ import java.util.List;
 @Extension
 public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     @Override
-    public CauseOfBlockage canRun(Queue.Item item) {
+    public CauseOfBlockage canRun(final Queue.Item item) {
         if (needsAdditionalNodes(item)) {
           if (allocateAdditionalNodes(item)) {
             return null; // unblock
@@ -32,7 +33,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             return new CauseOfBlockage() {
               @Override
               public String getShortDescription() {
-                return "Looking to allocate " + BlockItemQueueTaskDispatcher.this.getBuildVariable(item, "PLATFORM") + " ... " + BlockItemQueueTaskDispatcher.this.getBuildVariable(item, "PLATFORM_AXIS");
+                return "Looking to allocate " + getBuildVariable(item, "PLATFORM") + " ... " + getBuildVariable(item, "PLATFORM_AXIS");
                 //
                 // return "Unable to allocate additional nodes!";
               }
