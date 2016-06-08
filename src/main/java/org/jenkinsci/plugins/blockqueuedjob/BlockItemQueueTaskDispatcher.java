@@ -33,7 +33,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             return new CauseOfBlockage() {
               @Override
               public String getShortDescription() {
-                return "Looking to allocate " + getBuildVariable(item, "PLATFORM") + " ... " + getBuildVariable(item, "PLATFORM_AXIS");
+                return "Looking to allocate " + getBuildVariable(item, "JDK") + " ... " + getBuildVariable(item, "JDK_AXIS");
                 //
                 // return "Unable to allocate additional nodes!";
               }
