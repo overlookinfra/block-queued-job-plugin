@@ -46,8 +46,12 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
 
     public boolean needsAdditionalNodes(Queue.Item item) {
 
-      return true;
-      // TODO: check job for data indicating vmpooler nodes
+      if (item.task instanceof AbstractProject && !(item.task instanceof MatrixProject)) {
+        // TODO: check job for data indicating vmpooler nodes
+        return true;
+      } else {
+        return false;
+      }
     }
 
     public boolean allocateAdditionalNodes(Queue.Item item) {
@@ -76,7 +80,6 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
       } else {
         return "unknown class: " + item.task.getClass().getName();
       }
-      return null;
   }
 
   /**
