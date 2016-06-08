@@ -36,12 +36,12 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     }
 
     public boolean needsAdditionalNodes(Queue.Item item) {
-      return false;
+      return true;
       // TODO: check job for data indicating vmpooler nodes
     }
 
     public boolean allocateAdditionalNodes(Queue.Item item) {
-      return true;
+      return false;
       // TODO: attempt to allocate vmpooler nodes
       // TODO: store vmpooler node information with item
     }
