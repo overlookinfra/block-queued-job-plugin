@@ -31,9 +31,8 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             };
           }
         } else {
-          return null; // unblock
+          return super.canRun(item);
         }
-        return super.canRun(item);
     }
 
     public boolean needsAdditionalNodes(Queue.Item item) {
