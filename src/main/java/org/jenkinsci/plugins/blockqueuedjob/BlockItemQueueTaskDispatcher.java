@@ -19,28 +19,31 @@ import java.util.List;
 public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     @Override
     public CauseOfBlockage canRun(Queue.Item item) {
-        if (item.task instanceof Job<?, ?>) {
-            Job<?, ?> job = (Job<?, ?>) item.task;
-
-            final BlockItemJobProperty property = job.getProperty(BlockItemJobProperty.class);
-            if (property != null) {
-                List<BlockQueueCondition> conditions = property.getConditions();
-                if (conditions != null) {
-                    // first matched win
-                    for (BlockQueueCondition condition : conditions) {
-                        if (condition.isUnblocked(item)) {
-                            return null; // unblock
-                        }
-
-                        final CauseOfBlockage blocked = condition.isBlocked(item);
-                        if (blocked != null) {
-                            return blocked; // block
-                        }
-                    }
-                }
-            }
+        if (needsAdditionalNodes(item)) {
+          if (allocateAdditionalNodes(item)) {
+            return null; // unblock
+          } else {
+            return new CauseOfBlockage() {
+              @Override
+              public String getShortDescription() {
+                return "Unable to allocate additional nodes!";
+              }
+            };
+          }
+        } else {
+          return null; // unblock
         }
-
         return super.canRun(item);
+    }
+
+    public boolean needsAdditionalNodes(Queue.Item item) {
+      return false;
+      // TODO: check job for data indicating vmpooler nodes
+    }
+
+    public boolean allocateAdditionalNodes(Queue.Item item) {
+      return true;
+      // TODO: attempt to allocate vmpooler nodes
+      // TODO: store vmpooler node information with item
     }
 }
