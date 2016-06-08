@@ -2,11 +2,17 @@ package org.jenkinsci.plugins.blockqueuedjob;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
+import hudson.model.FreeStyleProject;
+import hudson.model.ParametersAction;
+import hudson.model.ParameterValue;
 import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
 import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition;
+import hudson.matrix.MatrixProject;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.Combination;
 
 import java.util.List;
 
@@ -26,7 +32,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             return new CauseOfBlockage() {
               @Override
               public String getShortDescription() {
-                return "Looking to allocate " + getBuildVariable(item, "PLATFORM") + " ... " + getBuildVariable(item, "PLATFORM_AXIS");
+                return "Looking to allocate " + BlockItemQueueTaskDispatcher.this.getBuildVariable(item, "PLATFORM") + " ... " + BlockItemQueueTaskDispatcher.this.getBuildVariable(item, "PLATFORM_AXIS");
                 //
                 // return "Unable to allocate additional nodes!";
               }
@@ -61,7 +67,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
    - For Matrix "cell" builds, check the hudson.matrix.Combination to get
      its current hudson.matrix.Axis values.
    */
-  private String getBuildVariable(Queue.Item item, String key) {
+  public String getBuildVariable(Queue.Item item, String key) {
       if (item.task instanceof FreeStyleProject) {
           return (String)getBuildParameterValue(item, key);
       } else if (item.task instanceof MatrixConfiguration) {
@@ -76,7 +82,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
      assumptions about the type of the actual build parameter setting and
      expectations of the calling context.
    */
-  private Object getBuildParameterValue(Queue.Item item, String parameterName) {
+  public Object getBuildParameterValue(Queue.Item item, String parameterName) {
       ParametersAction pAction = item.getAction(ParametersAction.class);
       ParameterValue pValue = pAction.getParameter(parameterName);
 
@@ -87,7 +93,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
      Given a Queue.Item and a String naming a MatrixProject Axis, return the
      value of that axis variable for this particular MatrixConfiguration.
    */
-  private String getCombinationAxisValue(Queue.Item item, String axisName) {
+  public String getCombinationAxisValue(Queue.Item item, String axisName) {
       MatrixConfiguration matrixConfig = (MatrixConfiguration)item.task;
       Combination combo = matrixConfig.getCombination();
 
@@ -103,7 +109,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
      new build parameter if it did not previously exist and override it if it
      does.
    */
-  private void setBuildParameterValue(Queue.Item item, String parameterName, String parameterValue) {
+  public void setBuildParameterValue(Queue.Item item, String parameterName, String parameterValue) {
       StringParameterValue sValue = new StringParameterValue(parameterName, parameterValue);
 
       ParametersAction oldAction = item.getAction(ParametersAction.class);
