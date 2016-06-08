@@ -73,6 +73,8 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
           return (String)getBuildParameterValue(item, key);
       } else if (item.task instanceof MatrixConfiguration) {
           return getCombinationAxisValue(item, key);
+      } else {
+        return "unknown class: " + item.task.getClass().getName();
       }
       return null;
   }
