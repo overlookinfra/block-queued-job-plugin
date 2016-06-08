@@ -26,7 +26,9 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             return new CauseOfBlockage() {
               @Override
               public String getShortDescription() {
-                return "Unable to allocate additional nodes!";
+                return "Looking to allocate " + getBuildVariable(item, "PLATFORM") + " ... " + getBuildVariable(item, "PLATFORM_AXIS");
+                //
+                // return "Unable to allocate additional nodes!";
               }
             };
           }
@@ -36,6 +38,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     }
 
     public boolean needsAdditionalNodes(Queue.Item item) {
+
       return true;
       // TODO: check job for data indicating vmpooler nodes
     }
