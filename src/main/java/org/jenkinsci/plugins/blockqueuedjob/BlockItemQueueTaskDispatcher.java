@@ -35,8 +35,7 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
               @Override
               public String getShortDescription() {
                 String current_time = new Date().toString();
-
-                return current_time + ": Looking to allocate TEST_TARGET[" + getBuildVariable(item, "TEST_TARGET") + "] ... TEST_TARGETS[" + getBuildVariable(item, "TEST_TARGETS") + "]";
+                return current_time + ": Looking to allocate TEST_TARGET[" + getBuildVariable(item, "TEST_TARGET") + "]";
                 //
                 // return "Unable to allocate additional nodes!";
               }
