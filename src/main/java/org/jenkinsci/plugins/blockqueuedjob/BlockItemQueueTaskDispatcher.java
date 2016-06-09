@@ -5,18 +5,23 @@ import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
 import hudson.model.ParameterValue;
-import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
-import org.jenkinsci.plugins.blockqueuedjob.condition.BlockQueueCondition;
+import org.apache.commons.io.IOUtils;
 import hudson.model.StringParameterValue;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.Combination;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Date;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Blocks item from execution according to configuration in JobProperty
@@ -49,17 +54,79 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
     public boolean needsAdditionalNodes(Queue.Item item) {
 
       if (item.task instanceof AbstractProject && !(item.task instanceof MatrixProject)) {
-        // TODO: check job for data indicating vmpooler nodes
-        return true;
+          // TODO: check job for data indicating vmpooler nodes
+          return (getBuildParameterValue(item, "VMPOOLER_HOSTNAME") == null);
       } else {
         return false;
       }
     }
 
     public boolean allocateAdditionalNodes(Queue.Item item) {
-      return false;
-      // TODO: attempt to allocate vmpooler nodes
-      // TODO: store vmpooler node information with item
+        Map<String, String> templates = new HashMap<>();
+        templates.put(getBuildVariable(item, "TEST_TARGET"), "1");
+
+        JSONObject data = new JSONObject(templates);
+
+        try {
+            Map<String, List<String>> vms = parseResults(post(data.toString()));
+            for (Iterator<List<String>> it = vms.values().iterator(); it.hasNext(); ) {
+                List<String> hostnames = it.next();
+                for (String hostname : hostnames) {
+                    setBuildParameterValue(item, "VMPOOLER_HOSTNAME", hostname);
+                }
+            }
+            return true;
+        } catch (IOException e) {
+            // TODO: differentiate between pool is empty vs requested VM doesn't exist
+            System.err.println("Failed to get VM: " + e.toString());
+            return false;
+        }
+    }
+
+    private String post(String data) throws IOException {
+        Process p = new ProcessBuilder("curl", "-f", "-d", data, "--url", "vmpooler.delivery.puppetlabs.net/api/v1/vm").start();
+
+        InputStream in = p.getInputStream();
+        try {
+            return IOUtils.toString(in, "UTF-8");
+        } finally {
+            in.close();
+        }
+    }
+
+    private static Map<String, List<String>> parseResults(String json) throws IOException {
+        Map<String, List<String>> vms = new HashMap<>();
+
+        JSONObject obj = new JSONObject(json);
+        if (!obj.getBoolean("ok")) {
+            throw new IOException("VMPooler request failed");
+        }
+
+        Set<String> platforms = obj.keySet();
+        platforms.remove("ok");
+        platforms.remove("domain");
+
+        for (String platform : platforms) {
+            List<String> hostnames = new ArrayList<>();
+
+            JSONObject hosts = obj.getJSONObject(platform);
+            try {
+                String hostname = hosts.getString("hostname");
+                //System.out.println("hostname: " + hostname + " (" + platform + ")");
+                hostnames.add(hostname);
+            } catch (JSONException e) {
+                JSONArray arr = hosts.getJSONArray("hostname");
+                for (Iterator it = arr.iterator(); it.hasNext(); ) {
+                    String hostname = (String)it.next();
+                    //System.out.println("hostname: " + hostname + " (" + platform + ")");
+                    hostnames.add(hostname);
+                }
+            }
+
+            vms.put(platform, hostnames);
+        }
+
+        return vms;
     }
 
   /**
@@ -92,9 +159,13 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
    */
   public Object getBuildParameterValue(Queue.Item item, String parameterName) {
       ParametersAction pAction = item.getAction(ParametersAction.class);
-      ParameterValue pValue = pAction.getParameter(parameterName);
-
-      return pValue.getValue();
+      if (pAction != null) {
+          ParameterValue pValue = pAction.getParameter(parameterName);
+          if (pValue != null) {
+              return pValue.getValue();
+          }
+      }
+      return null;
   }
 
   /**

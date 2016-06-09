@@ -27,6 +27,8 @@ echo "Successfully provisioned the machine."
 echo "You can run the Jenkins server with plugin installed as follows:"
 echo "> vagrant ssh"
 echo "> cd block-queued-job-plugin"
+echo "> export JENKINS_HOME=/home/vagrant/work"
+echo "> export MAVEN_OPTS='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n'"
 echo "> mvn hpi:run"
 echo "****************************************************************"
 
@@ -46,12 +48,10 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/trusty64"
 
-  # Forward mesos ports.
-  config.vm.network "forwarded_port", guest: 5050, host: 5050
-  config.vm.network "forwarded_port", guest: 5051, host: 5051
-
   # Forward jenkins port.
   config.vm.network "forwarded_port", guest: 8080, host: 8080
+  # Forward jenkins-debug port
+  config.vm.network "forwarded_port", guest: 8000, host: 8000
 
   # Provision the system.
   config.vm.provision "shell", inline: $script
