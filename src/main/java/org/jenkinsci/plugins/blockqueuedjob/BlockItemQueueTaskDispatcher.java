@@ -16,6 +16,7 @@ import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.Combination;
 
 import java.util.List;
+import java.util.Date;
 
 /**
  * Blocks item from execution according to configuration in JobProperty
@@ -33,7 +34,9 @@ public class BlockItemQueueTaskDispatcher extends QueueTaskDispatcher {
             return new CauseOfBlockage() {
               @Override
               public String getShortDescription() {
-                return "Looking to allocate " + getBuildVariable(item, "JDK") + " ... " + getBuildVariable(item, "JDK_AXIS");
+                String current_time = new Date().toString();
+
+                return current_time + ": Looking to allocate TEST_TARGET[" + getBuildVariable(item, "TEST_TARGET") + "] ... TEST_TARGETS[" + getBuildVariable(item, "TEST_TARGETS") + "]";
                 //
                 // return "Unable to allocate additional nodes!";
               }
