@@ -2,3 +2,6 @@
 target/
 work/
 *.iml
+.vagrant
+target
+work
